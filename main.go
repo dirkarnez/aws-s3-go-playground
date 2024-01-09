@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -38,10 +40,15 @@ func (basics BucketBasics) UploadFile(bucketName string, objectKey string, fileN
 }
 
 func main() {
-https: //docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials-chain.html
-	var a = s3.NewFromConfig()
-	a.
-		BucketBasics{}.UploadFile("stemexhub", "324", "testing.txt")
-}
 
-//s3://stemexhub-files/Course Resources/s3://stemexhub-files/Course Resources/
+	opts := [](func(*config.LoadOptions) error){
+		config.WithRegion("ap-east-1"),
+		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("", "", "")),
+	}
+	cfg, err := config.LoadDefaultConfig(context.TODO(), opts...)
+	if err != nil {
+		log.Fatalf("failed to load configuration, %v", err)
+	}
+
+	BucketBasics{S3Client: s3.NewFromConfig(cfg)}.UploadFile("stemexhub-files", "324", "README.md")
+}
